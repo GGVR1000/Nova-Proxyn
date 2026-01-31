@@ -5,7 +5,7 @@ const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// This ensures your HTML file is found
+// Serves the Glass UI from the public folder
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/service', (req, res, next) => {
@@ -16,11 +16,13 @@ app.use('/service', (req, res, next) => {
         target: targetUrl,
         changeOrigin: true,
         followRedirects: true,
-        autoRewrite: true, // This helps fix the "Cannot GET /results" error
+        autoRewrite: true,
         pathRewrite: { '^/service': '' },
         onProxyRes: (proxyRes) => {
+            // Strips security that blocks YouTube search results and UI
             delete proxyRes.headers['content-security-policy'];
             delete proxyRes.headers['x-frame-options'];
+            delete proxyRes.headers['cross-origin-opener-policy'];
             proxyRes.headers['Access-Control-Allow-Origin'] = '*';
         },
         onProxyReq: (proxyReq) => {
@@ -29,5 +31,4 @@ app.use('/service', (req, res, next) => {
     })(req, res, next);
 });
 
-// Start the engine
-app.listen(PORT, () => console.log(`Nova-Proxyn Ultra active on ${PORT}`));
+app.listen(PORT, () => console.log(`Nova-Proxyn Engine Active on ${PORT}`));
