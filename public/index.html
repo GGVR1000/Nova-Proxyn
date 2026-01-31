@@ -18,11 +18,10 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            /* Animated background */
             background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #020617);
             background-size: 400% 400%;
             animation: gradientMove 15s ease infinite;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
             color: white;
             overflow: hidden;
         }
@@ -40,42 +39,35 @@
             border: 1px solid var(--border);
             border-radius: 40px;
             padding: 60px;
-            width: 100%;
-            max-width: 600px;
+            width: 90%;
+            max-width: 650px;
             text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             position: relative;
         }
 
         #clock {
-            font-size: 5.5rem;
-            font-weight: 100;
-            margin-bottom: 10px;
-            letter-spacing: -3px;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+            font-size: 5rem;
+            font-weight: 200;
+            margin-bottom: 5px;
+            letter-spacing: -2px;
         }
 
         .date-display {
-            font-size: 1rem;
-            opacity: 0.6;
+            font-size: 0.9rem;
+            opacity: 0.5;
             margin-bottom: 40px;
+            letter-spacing: 3px;
             text-transform: uppercase;
-            letter-spacing: 2px;
         }
 
         .search-container {
             display: flex;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.2);
             border: 1px solid var(--border);
             border-radius: 20px;
-            padding: 10px;
+            padding: 8px;
             margin-bottom: 30px;
-            transition: transform 0.3s, border-color 0.3s;
-        }
-
-        .search-container:focus-within {
-            border-color: var(--accent);
-            transform: translateY(-2px);
         }
 
         input {
@@ -88,152 +80,110 @@
             outline: none;
         }
 
-        input::placeholder { color: rgba(255, 255, 255, 0.3); }
-
         .launch-btn {
             background: var(--accent);
             color: #0f172a;
             border: none;
-            padding: 0 30px;
+            padding: 0 25px;
             border-radius: 15px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: 0.3s;
         }
 
         .launch-btn:hover {
-            background: #7dd3fc;
-            box-shadow: 0 0 15px rgba(56, 189, 248, 0.5);
-        }
-
-        .settings-label {
-            font-size: 0.75rem;
-            opacity: 0.4;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
+            filter: brightness(1.2);
+            box-shadow: 0 0 15px var(--accent);
         }
 
         .theme-selector {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .theme-dot {
-            width: 30px;
-            height: 30px;
+            width: 25px;
+            height: 25px;
             border-radius: 50%;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: transform 0.2s, border-color 0.2s;
+            transition: 0.2s;
         }
 
-        .theme-dot:hover {
-            transform: scale(1.2);
-            border-color: white;
-        }
+        .theme-dot:hover { transform: scale(1.2); border-color: white; }
 
-        .status-badge {
+        .status {
             position: absolute;
-            top: 25px;
-            right: 40px;
-            font-size: 0.7rem;
-            background: rgba(34, 197, 94, 0.2);
+            top: 20px;
+            right: 30px;
+            font-size: 0.65rem;
             color: #4ade80;
-            padding: 5px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(74, 222, 128, 0.3);
+            letter-spacing: 1px;
         }
     </style>
 </head>
 <body>
 
     <div class="glass-panel">
-        <div class="status-badge">SYSTEM SECURE</div>
-        
+        <div class="status">● PROXY ENGINE ACTIVE</div>
         <div id="clock">00:00:00</div>
-        <div class="date-display" id="date">JANUARY 01, 2026</div>
+        <div class="date-display" id="date">LOADING...</div>
 
         <div class="search-container">
-            <input type="text" id="targetUrl" placeholder="Enter target URL (e.g. https://google.com)" autocomplete="off">
+            <input type="text" id="targetUrl" placeholder="Enter URL (e.g., wikipedia.org)" autocomplete="off">
             <button class="launch-btn" onclick="launchProxy()">LAUNCH</button>
         </div>
 
-        <div class="settings-label">COSMOS CONFIGURATION</div>
         <div class="theme-selector">
-            <div class="theme-dot" style="background: #0f172a;" onclick="setTheme('deep-space')"></div>
-            <div class="theme-dot" style="background: linear-gradient(45deg, #4338ca, #6366f1);" onclick="setTheme('nebula')"></div>
-            <div class="theme-dot" style="background: linear-gradient(45deg, #064e3b, #059669);" onclick="setTheme('forest')"></div>
-            <div class="theme-dot" style="background: linear-gradient(45deg, #7c3aed, #db2777);" onclick="setTheme('cyber')"></div>
+            <div class="theme-dot" style="background: #0f172a;" onclick="setTheme('default')"></div>
+            <div class="theme-dot" style="background: #312e81;" onclick="setTheme('nebula')"></div>
+            <div class="theme-dot" style="background: #064e3b;" onclick="setTheme('forest')"></div>
+            <div class="theme-dot" style="background: #581c87;" onclick="setTheme('void')"></div>
         </div>
     </div>
 
     <script>
-        // --- 1. CLOCK LOGIC ---
+        // 1. CLOCK
         function updateClock() {
             const now = new Date();
-            const timeStr = now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-            const dateStr = now.toLocaleDateString([], { month: 'long', day: '2-digit', year: 'numeric' });
-            
-            document.getElementById('clock').textContent = timeStr;
-            document.getElementById('date').textContent = dateStr;
+            document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour12: false});
+            document.getElementById('date').textContent = now.toLocaleDateString([], {month: 'long', day: 'numeric', year: 'numeric'});
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // --- 2. PROXY LAUNCHER ---
+        // 2. PROXY LAUNCHER
         function launchProxy() {
-            const urlInput = document.getElementById('targetUrl').value.trim();
-            
-            if (!urlInput) {
-                alert("Please enter a URL first.");
-                return;
+            const input = document.getElementById('targetUrl').value.trim();
+            if (!input) return;
+
+            let url = input;
+            if (!url.startsWith('http')) {
+                url = 'https://' + url;
             }
 
-            // Ensure URL has a protocol
-            let finalUrl = urlInput;
-            if (!urlInput.startsWith('http://') && !urlInput.startsWith('https://')) {
-                finalUrl = 'https://' + urlInput;
-            }
-
-            // Redirect to our Express proxy route
-            window.location.href = `/service?url=${encodeURIComponent(finalUrl)}`;
+            // This routes the request THROUGH your server
+            window.location.href = `/service?url=${encodeURIComponent(url)}`;
         }
 
-        // Allow 'Enter' key to trigger launch
-        document.getElementById('targetUrl').addEventListener('keypress', function (e) {
+        // Enter key support
+        document.getElementById('targetUrl').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') launchProxy();
         });
 
-        // --- 3. THEME ENGINE ---
+        // 3. THEMES
         function setTheme(theme) {
-            const body = document.body;
-            let gradient = "";
-
-            switch(theme) {
-                case 'deep-space':
-                    gradient = "linear-gradient(-45deg, #0f172a, #1e293b, #334155, #020617)";
-                    break;
-                case 'nebula':
-                    gradient = "linear-gradient(-45deg, #1e1b4b, #312e81, #4338ca, #1e1b4b)";
-                    break;
-                case 'forest':
-                    gradient = "linear-gradient(-45deg, #064e3b, #065f46, #0f766e, #064e3b)";
-                    break;
-                case 'cyber':
-                    gradient = "linear-gradient(-45deg, #2e1065, #4c1d95, #701a75, #2e1065)";
-                    break;
-            }
-
-            body.style.background = gradient;
-            body.style.backgroundSize = "400% 400%";
-            // Save preference to browser
-            localStorage.setItem('nova_theme', theme);
+            const colors = {
+                'default': 'linear-gradient(-45deg, #0f172a, #1e293b, #334155, #020617)',
+                'nebula': 'linear-gradient(-45deg, #1e1b4b, #312e81, #4338ca, #1e1b4b)',
+                'forest': 'linear-gradient(-45deg, #064e3b, #065f46, #0f766e, #064e3b)',
+                'void': 'linear-gradient(-45deg, #2e1065, #4c1d95, #701a75, #2e1065)'
+            };
+            document.body.style.background = colors[theme];
+            document.body.style.backgroundSize = "400% 400%";
         }
-
-        // Load saved theme on startup
-        const savedTheme = localStorage.getItem('nova_theme');
-        if (savedTheme) setTheme(savedTheme);
     </script>
 </body>
 </html>
