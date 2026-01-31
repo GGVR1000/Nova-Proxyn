@@ -3,141 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova-Proxyn | Secure Hub</title>
+    <title>Nova-Proxyn</title>
     <style>
         :root {
             --glass: rgba(255, 255, 255, 0.1);
-            --border: rgba(255, 255, 255, 0.15);
             --accent: #38bdf8;
         }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
         body {
+            margin: 0;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: linear-gradient(-45deg, #020617, #1e1b4b, #0f172a, #020617);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: radial-gradient(circle at center, #1e293b, #0f172a);
+            font-family: sans-serif;
             color: white;
-            overflow: hidden;
         }
-
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
-        .glass-panel {
+        .container {
             background: var(--glass);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid var(--border);
-            border-radius: 40px;
-            padding: 60px;
-            width: 90%;
-            max-width: 600px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 50px;
+            border-radius: 30px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            width: 90%;
+            max-width: 500px;
         }
-
         #clock {
-            font-size: 6rem;
-            font-weight: 200;
-            letter-spacing: -4px;
-            margin-bottom: 5px;
+            font-size: 4rem;
+            margin-bottom: 20px;
         }
-
-        .date {
-            font-size: 0.8rem;
-            opacity: 0.5;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-bottom: 40px;
-        }
-
-        .search-box {
+        .search-bar {
             display: flex;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 8px;
-            transition: 0.3s;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-
-        .search-box:focus-within {
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
-        }
-
         input {
             flex: 1;
             background: none;
             border: none;
             padding: 15px;
             color: white;
-            font-size: 1.1rem;
             outline: none;
+            font-size: 1rem;
         }
-
-        .btn {
+        button {
             background: var(--accent);
-            color: #020617;
             border: none;
-            padding: 0 30px;
-            border-radius: 15px;
-            font-weight: 700;
+            padding: 0 20px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px var(--accent);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <div class="glass-panel">
+    <div class="container">
         <div id="clock">00:00</div>
-        <div class="date" id="date">JANUARY 01, 2026</div>
-
-        <div class="search-box">
-            <input type="text" id="urlInput" placeholder="Enter URL or search YouTube..." autocomplete="off">
-            <button class="btn" onclick="launch()">GO</button>
+        <div class="search-bar">
+            <input type="text" id="urlInput" placeholder="Search YouTube or enter URL...">
+            <button onclick="launch()">GO</button>
         </div>
     </div>
 
     <script>
-        // Update Clock
-        function tick() {
+        // Clock Function
+        function updateClock() {
             const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit' });
-            document.getElementById('date').textContent = now.toLocaleDateString([], { month: 'long', day: 'numeric', year: 'numeric' });
+            document.getElementById('clock').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
         }
-        setInterval(tick, 1000);
-        tick();
+        setInterval(updateClock, 1000);
+        updateClock();
 
-        // Launch Proxy
+        // Launch Function
         function launch() {
             let val = document.getElementById('urlInput').value.trim();
             if (!val) return;
 
-            // Smart logic: if it's not a URL, search YouTube
+            let finalUrl;
+            
+            // If it doesn't look like a URL (no dots), treat it as a YouTube search
             if (!val.includes('.') && !val.startsWith('http')) {
-                val = `https://www.youtube.com/results?search_query=${encodeURIComponent(val)}`;
-            } else if (!val.startsWith('http')) {
-                val = 'https://' + val;
+                finalUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(val)}`;
+            } else {
+                // If it's a URL, make sure it has https
+                finalUrl = val.startsWith('http') ? val : 'https://' + val;
             }
 
-            window.location.href = `/service?url=${encodeURIComponent(val)}`;
+            // Route through our proxy service
+            window.location.href = `/service?url=${encodeURIComponent(finalUrl)}`;
         }
 
+        // Allow pressing "Enter" to search
         document.getElementById('urlInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') launch();
         });
